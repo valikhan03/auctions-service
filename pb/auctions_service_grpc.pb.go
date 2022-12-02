@@ -124,6 +124,7 @@ type AuctionsServiceServer interface {
 	AddProduct(context.Context, *AddProductRequest) (*Response, error)
 	UpdateProduct(context.Context, *UpdateProductRequest) (*Response, error)
 	DeleteProduct(context.Context, *DeletePoductRequest) (*Response, error)
+	//mustEmbedUnimplementedAuctionsServiceServer()
 }
 
 // UnimplementedAuctionsServiceServer must be embedded to have forward compatible implementations.

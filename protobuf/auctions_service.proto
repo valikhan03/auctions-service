@@ -11,13 +11,11 @@ message Auction {
     string description = 3;
     int64 organizerID = 4;
     int32 max_participants = 5;
-    int32 participants_number = 6;
-    string starts_at = 7;
-    string ends_at = 8;   
+    int32 participants_number = 6; 
 };
 
 message Product{
-    string id = 1;
+    int64 id = 1;
     string auction_id = 2;
     string title = 3;
     string description = 4;
