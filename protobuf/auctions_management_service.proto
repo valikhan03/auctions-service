@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+package protobuf;
+
+option go_package="/pb/auctions_management_service";
+
+
+
+message StartAuctionRequest {
+    string auction_id = 1;
+};
+
+message StartAuctionResponse {
+    int32 status = 1;
+    string error = 2;
+};
+
+message SetStartTimeRequest {
+    string auction_id = 1;
+    string start_time = 2;
+    string timezone = 3; 
+};
+
+message SetStartTimeResponse {
+    int32 status = 1;
+    string error = 2; 
+};
+
+message CancelAuctionRequest {
+    string auction_id = 1;
+};
+
+message CancelAuctionResponse {
+    int32 status = 1;
+    string error = 2;
+};
+
+
+
+service AuctionsManagementService {
+    rpc StartAuction (StartAuctionRequest) returns (StartAuctionResponse) {};
+
+    rpc CancelAuction (CancelAuctionRequest) returns (CancelAuctionResponse) {};
+
+    rpc SetStartTime (SetStartTimeRequest) returns (SetStartTimeResponse) {};
+};
