@@ -15,10 +15,12 @@ require (
 	github.com/elastic/go-elasticsearch/v8 v8.6.0 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/uuid v1.3.0 // indirect
+	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/redis/go-redis/v9 v9.0.2 // indirect
-	github.com/valikhan03/tool v1.0.0 // indirect
+	github.com/valikhan03/tool v1.1.1 // indirect
 	golang.org/x/net v0.0.0-20220728211354-c7608f3a8462 // indirect
 	golang.org/x/sys v0.0.0-20220730100132-1609e554cd39 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	google.golang.org/genproto v0.0.0-20220728213248-dd149ef739b9 // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

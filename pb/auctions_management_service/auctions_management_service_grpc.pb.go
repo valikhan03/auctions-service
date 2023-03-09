@@ -69,7 +69,6 @@ type AuctionsManagementServiceServer interface {
 	StartAuction(context.Context, *StartAuctionRequest) (*StartAuctionResponse, error)
 	CancelAuction(context.Context, *CancelAuctionRequest) (*CancelAuctionResponse, error)
 	SetStartTime(context.Context, *SetStartTimeRequest) (*SetStartTimeResponse, error)
-	mustEmbedUnimplementedAuctionsManagementServiceServer()
 }
 
 // UnimplementedAuctionsManagementServiceServer must be embedded to have forward compatible implementations.

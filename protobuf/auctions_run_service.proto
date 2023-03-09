@@ -9,7 +9,7 @@ option go_package="/pb/auctions_run_service";
 message SuggestPriceRequest {
     int64 UserID = 1;
     string AuctionID = 2;
-    string ProductID = 3;
+    string LotID = 3;
     int64 NewPrice = 4;
 };
 
@@ -20,12 +20,12 @@ message SuggestPriceResponse {
 
 message GetCurrentPriceRequest {
     string AuctionID = 1;
-    string ProductID = 2;
+    string LotID = 2;
+    string userID = 3;
 };
 
 message GetCurrentPriceResponse {
-    string Username = 1;
-    string Price = 2;
+    map<string, string> UserPrice = 1;
 };
 
 service AuctionsRunService {

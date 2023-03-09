@@ -81,7 +81,6 @@ func (x *auctionsRunServiceGetCurrentPriceClient) Recv() (*GetCurrentPriceRespon
 type AuctionsRunServiceServer interface {
 	SuggestPrice(context.Context, *SuggestPriceRequest) (*SuggestPriceResponse, error)
 	GetCurrentPrice(*GetCurrentPriceRequest, AuctionsRunService_GetCurrentPriceServer) error
-	mustEmbedUnimplementedAuctionsRunServiceServer()
 }
 
 // UnimplementedAuctionsRunServiceServer must be embedded to have forward compatible implementations.
