@@ -10,12 +10,17 @@ import (
 	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/elastic/go-elasticsearch/v8/esapi"
 	"github.com/redis/go-redis/v9"
+	"github.com/valikhan03/auctions-service/kafka"
 	"github.com/valikhan03/tool"
 )
 
+type CmdMessage struct {
+}
+
 type ManageRepository struct {
-	rdb     *redis.Client
-	elastic *elasticsearch.Client
+	rdb       *redis.Client
+	elastic   *elasticsearch.Client
+	eventChan chan kafka.Event
 }
 
 func NewManageRepository(redisConn *redis.Client, elasticConn *elasticsearch.Client) *ManageRepository {
@@ -27,7 +32,7 @@ func NewManageRepository(redisConn *redis.Client, elasticConn *elasticsearch.Cli
 
 func (r *ManageRepository) SetStatusActive(auctionID string) error {
 	//set status ACTIVE
-	//add products and start prices to Redis
+	//add products and start-prices to Redis
 	//allow user sessions to achieve data - auth level
 	//create stream in redis
 
@@ -53,7 +58,7 @@ func (r *ManageRepository) SetStatusActive(auctionID string) error {
 	}
 
 	if updRes.IsError() {
-		return errors.New(fmt.Sprintf("[%s] %s", updRes.Status(), updRes.String()))
+		return fmt.Errorf("[%s] %s", updRes.Status(), updRes.String())
 	}
 
 	return nil
@@ -103,11 +108,6 @@ func (r *ManageRepository) MigrateLotsRedis(auctionID string) error {
 			return err
 		}
 
-		err = r.rdb.XGroupCreate(context.TODO(), auctionID, lotID, "$").Err()
-		if err != nil {
-			return err
-		}
-
 		err = r.rdb.XAdd(context.TODO(), &redis.XAddArgs{
 			Stream: auctionID,
 			Values: map[string]interface{}{
@@ -119,13 +119,15 @@ func (r *ManageRepository) MigrateLotsRedis(auctionID string) error {
 		if err != nil {
 			return err
 		}
+
+		err = r.rdb.XGroupCreate(context.TODO(), auctionID, lotID, "0").Err()
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
-} 
-
-
-
+}
 
 func (r *ManageRepository) SetStatusCancelled(auctionID string) error {
 	//set status CANCELLED
@@ -152,6 +154,58 @@ func (r *ManageRepository) SetStatusCancelled(auctionID string) error {
 		return errors.New(fmt.Sprintf("[%s] %s", updRes.Status(), updRes.String()))
 	}
 
+	lots, err := r.GetAllLotsList(auctionID)
+	if err != nil {
+		return err
+	}
+
+	if len(lots) == 0 {
+		return errors.New("No Lots found")
+	}
+
+	for _, lotID := range lots {
+		price, err := r.rdb.HGet(context.TODO(), fmt.Sprintf("%s/%s", auctionID, lotID), "price").Result()
+		if err != nil {
+			return err
+		}
+		currency, err := r.rdb.HGet(context.TODO(), fmt.Sprintf("%s/%s", auctionID, lotID), "currency").Result()
+		if err != nil {
+			return err
+		}
+		// price, err := strconv.Atoi(price_res)
+		// if err != nil{
+		// 	return err
+		// }
+
+		userid, err := r.rdb.HGet(context.TODO(), fmt.Sprintf("%s/%s", auctionID, lotID), "userid").Result()
+		if err != nil {
+			return err
+		}
+		// userid, err := strconv.Atoi(userid_res)
+		// if err != nil{
+		// 	return err
+		// }
+
+		r.eventChan <- kafka.Event{
+			Command: tool.CRE_INV_EVENT,
+			Entity:  map[string]interface{}{"price": price, 
+											"currency": currency,
+											"user_id": userid, 
+											"product_id": lotID,
+											"product_type":3, 
+											"auction_id": auctionID},
+		}
+	}
+
 	return nil
 }
 
+
+// func (r *ManageRepository) CheckRequirements(auction_id string) (bool, error) {
+// 	query := `select p_is_payed from tb_invoices
+// 			  where exists(select 1 from tb_invoices t where
+// 						   t.product_type=$1 and
+// 						   t.product_id=$2)`
+	
+	
+// }

@@ -46,7 +46,7 @@ func (r *RunRepository) SetSuggestPrice(ctx context.Context, auctionID, lotID st
 
 	//r.rdb.SAdd()
 
-	err = r.rdb.LPush(ctx, fmt.Sprintf("%s/%s", auctionID, lotID),
+	err = r.rdb.HSet(ctx, fmt.Sprintf("%s/%s", auctionID, lotID),
 		map[string]interface{}{"userid": userID, "price": price}).Err()
 	if err != nil {
 		return err
@@ -56,6 +56,8 @@ func (r *RunRepository) SetSuggestPrice(ctx context.Context, auctionID, lotID st
 }
 
 func (r *RunRepository) GetMaxPrice(ctx context.Context, auctionID, lotID string) (int64, error) {
+
+	//res, err := r.rdb.LRange(ctx, fmt.Sprintf("%s/%s", auctionID, lotID), -1, -1).Result()
 
 	res, err := r.rdb.HGet(ctx, fmt.Sprintf("%s/%s", auctionID, lotID), "price").Result()
 	if err != nil {

@@ -40,22 +40,23 @@ func (s *AuctionsRunService) SuggestPrice(ctx context.Context, req *pb.SuggestPr
 	return &pb.SuggestPriceResponse{Status: 200}, nil
 }
 
-func (s *AuctionsRunService) GetCurrentPrice(req *pb.GetCurrentPriceRequest, stream pb.AuctionsRunService_GetCurrentPriceServer) error {
+func (s *AuctionsRunService) GetCurrentPrice(req *pb.GetCurrentPriceRequest, 
+					stream pb.AuctionsRunService_GetCurrentPriceServer) error {
 	err := s.repository.InitConsumer(req.UserID, req.AuctionID, req.LotID)
 	if err != nil{
 		log.Printf("InitConsumer error: %s", err.Error())
 		return err
 	}
 
-	defer func(){}()
-
 	for{
 		res, err := s.repository.ReadMaxPrice(context.TODO(), req.AuctionID, req.LotID, req.UserID)
 		if err != nil{
 			log.Printf("GetCurrentPrice error: %s",err.Error())
-			continue
+			break
 		}
 		stream.Send(&pb.GetCurrentPriceResponse{UserPrice: res})
 	}
+
+	return err
 }
 

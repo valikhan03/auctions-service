@@ -18,11 +18,12 @@ func NewAuctionsManagementService(mng_repo *repositories.ManageRepository) *Auct
 	}
 }
 
-func (s *AuctionsManagementService) StartAuction(ctx context.Context, req *pb.StartAuctionRequest) (*pb.StartAuctionResponse, error) {
-	//set status ACTIVE
-	//add products and start prices to Redis
-	//allow user sessions to achieve data - auth level
-	//create stream in redis
+func (s *AuctionsManagementService) StartAuction (ctx context.Context, req *pb.StartAuctionRequest) (*pb.StartAuctionResponse, error) {
+	// auctionType, err := s.repository.GetAuctionType(req.AuctionId)
+	// if err != nil {
+	// 	log.Println(err)
+	// 	return nil, err
+	// }
 	err := s.repository.SetStatusActive(req.AuctionId)
 	if err != nil{
 		log.Printf("SetStatusActive error: %s", err.Error())
@@ -34,7 +35,14 @@ func (s *AuctionsManagementService) StartAuction(ctx context.Context, req *pb.St
 		log.Printf("MigrateLotsRedis error: %s", err.Error())
 		return nil, err
 	}
-
+	// if auctionType == 2  {
+	// 	err = s.repository.MigrateLotsRedis(req.AuctionId)
+	// 	if err != nil{
+	// 		log.Printf("MigrateLotsRedis error: %s", err.Error())
+	// 		return nil, err
+	// 	}
+	// }
+	
 	return &pb.StartAuctionResponse{Status: 200}, nil
 }
 

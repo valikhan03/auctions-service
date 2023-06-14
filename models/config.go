@@ -35,6 +35,29 @@ type redisConfig struct {
 
 var RedisConfigGlobal redisConfig
 
+
+type KafkaConfigs struct {
+	Brokers []string `yaml:"brokers"`
+	Topic   string   `yaml:"topic"`
+}
+
+func GetKafkaConfigs() *KafkaConfigs {
+	data, err := ioutil.ReadFile("configs/kafka.yaml")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var configs KafkaConfigs
+
+	err = yaml.Unmarshal(data, &configs)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return &configs
+}
+
+
 func InitConfigs() {
 	godotenv.Load()
 
